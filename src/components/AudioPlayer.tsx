@@ -2,7 +2,7 @@
 
 import {
   AudioHTMLAttributes,
-  useCallback,
+  ChangeEvent,
   useEffect,
   useMemo,
   useRef,
@@ -12,97 +12,144 @@ import {
 type AudioPlayerProps = AudioHTMLAttributes<HTMLAudioElement>
 
 function getSecs(t: number): string {
-  const res = parseInt(`${t % 60}`, 10)
-  return res < 10 ? `0${res}` : `${res}`
+  return `${parseInt(`${t % 60}`, 10)}`.padStart(2, '0')
 }
 
 function getMins(t: number): string {
-  const res = parseInt(`${(t / 60) % 60}`, 10)
-  return res < 10 ? `0${res}` : `${res}`
+  return `${parseInt(`${(t / 60) % 60}`, 10)}`.padStart(2, '0')
 }
 
 function AudioPlayer(props: AudioPlayerProps) {
   const { src } = props
-  const audio = useRef<HTMLAudioElement>(null)
   const [show, setShow] = useState(false)
-  const [audioContext, setAudioContext] = useState<AudioContext>()
+  const audio = useRef<HTMLAudioElement>(null)
+  const [audioCtx, setAudioCtx] = useState<AudioContext>()
   const [track, setTrack] = useState<MediaElementAudioSourceNode>()
+  const [gainNode, setGainNode] = useState<GainNode>()
+  const [analyzerNode, setAnalyzerNode] = useState<AnalyserNode>()
+  const [bufferLength, setBufferLength] = useState<number>()
+  const [dataArray, setDataArray] = useState<Uint8Array>()
+  const [volume, setVolume] = useState<number>(0.4)
   const [playing, setPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [processMax, setProcessMax] = useState(0)
-  const durationSecs = useMemo(() => getSecs(duration), [duration])
-  const durationMins = useMemo(() => getMins(duration), [duration])
-  const currentTimeSecs = useMemo(() => getSecs(currentTime), [currentTime])
-  const currentTimeMins = useMemo(() => getMins(currentTime), [currentTime])
+  const [animationId, setAnimationId] = useState<number>()
 
-  const togglePlay = useCallback(async () => {
-    if (audioContext?.state === 'suspended') {
-      await audioContext.resume()
-    }
+  function seekTo(event: ChangeEvent<HTMLInputElement>) {
     if (audio.current) {
-      if (playing) {
-        audio.current.pause()
-        setPlaying(false)
-      } else {
-        await audio.current.play()
-        setPlaying(true)
-      }
+      audio.current.currentTime = +event.target.value
     }
-  }, [audioContext, playing])
+  }
 
-  const handleLoadedMetaData = useCallback(() => {
+  function changeVolume(event: ChangeEvent<HTMLInputElement>) {
+    const volume = +event.target.value
+    setVolume(volume)
+    setGainNode((gainNode) => {
+      if (!gainNode) return
+      gainNode.gain.value = volume
+      return gainNode
+    })
+  }
+
+  function onLoadedMetadata() {
     if (audio.current) {
       const { duration } = audio.current
       setDuration(duration)
       setProcessMax(duration)
     }
-  }, [])
+  }
 
-  const handleTimeUpdate = useCallback(() => {
+  function onTimeUpdate() {
     if (audio.current) {
       const { currentTime } = audio.current
       setCurrentTime(currentTime)
     }
-  }, [])
+  }
+
+  function onEnded() {
+    setPlaying(false)
+  }
+
+  function initializeAudio() {
+    if (audio.current) {
+      const audioCtx = new AudioContext()
+      const track = audioCtx.createMediaElementSource(audio.current)
+      const gainNode = audioCtx.createGain()
+      const analyzerNode = audioCtx.createAnalyser()
+      const bufferLength = analyzerNode.frequencyBinCount
+      const dataArray = new Uint8Array(bufferLength)
+
+      analyzerNode.fftSize = 2048
+      analyzerNode.getByteFrequencyData(dataArray)
+
+      track.connect(gainNode).connect(audioCtx.destination)
+
+      setAudioCtx(audioCtx)
+      setTrack(track)
+      setGainNode(gainNode)
+      setAnalyzerNode(analyzerNode)
+      setBufferLength(bufferLength)
+      setDataArray(dataArray)
+    }
+  }
+
+  function updateFrequency() {
+    console.log('updateFrequency')
+    setAnimationId(requestAnimationFrame(updateFrequency))
+  }
+
+  async function togglePlay() {
+    if (audioCtx?.state === 'suspended') {
+      await audioCtx.resume()
+    }
+    if (audio.current) {
+      if (playing) {
+        audio.current.pause()
+        setPlaying(false)
+        animationId && cancelAnimationFrame(animationId)
+      } else {
+        await audio.current.play()
+        setPlaying(true)
+        updateFrequency()
+      }
+    }
+  }
 
   useEffect(() => {
     setShow(true)
-    setAudioContext(new AudioContext())
   }, [])
 
   useEffect(() => {
-    setTrack((prevTrack) => {
-      if (!audioContext || !audio.current) return
-      if (prevTrack) return prevTrack
-
-      const currTrack = audioContext.createMediaElementSource(audio.current)
-      currTrack.connect(audioContext.destination)
-      return currTrack
-    })
-  }, [audioContext])
+    if (show && src) {
+      initializeAudio()
+    }
+  }, [show, src])
 
   return (
     <>
       {show && (
         <div>
           <audio
+            className="hidden"
             src={src}
             ref={audio}
             controls
-            onLoadedMetadata={handleLoadedMetaData}
-            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={onLoadedMetadata}
+            onTimeUpdate={onTimeUpdate}
+            onEnded={onEnded}
           />
           <button onClick={togglePlay}>{playing ? 'Pause' : 'Play'}</button>
+          <canvas />
           <div>
-            <span>{`${currentTimeMins}:${currentTimeSecs}`}</span>
+            <span>{`${getMins(currentTime)}:${getSecs(currentTime)}`}</span>
             <input
               type="range"
               max={processMax}
               value={currentTime}
-              onChange={() => {}}
+              onChange={seekTo}
             />
-            <span>{`${durationMins}:${durationSecs}`}</span>
+            <span>{`${getMins(duration)}:${getSecs(duration)}`}</span>
             <canvas></canvas>
           </div>
           <div>
@@ -111,8 +158,8 @@ function AudioPlayer(props: AudioPlayerProps) {
               min={0}
               max={2}
               step={0.01}
-              value={1}
-              onChange={() => {}}
+              value={volume}
+              onChange={changeVolume}
             />
           </div>
         </div>
