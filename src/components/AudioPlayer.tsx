@@ -31,6 +31,7 @@ function AudioPlayer(props: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
   const volumeRef = useRef<HTMLDivElement>(null)
+  const requestRef = useRef<number>()
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying)
@@ -101,6 +102,18 @@ function AudioPlayer(props: AudioPlayerProps) {
     }
   }, [isPlaying])
 
+  useEffect(() => {
+    if (isPlaying) {
+      const updateFrequency = () => {
+        console.log('updateFrequency')
+        requestRef.current = requestAnimationFrame(updateFrequency)
+      }
+      updateFrequency()
+    } else {
+      requestRef.current && cancelAnimationFrame(requestRef.current)
+    }
+  }, [isPlaying])
+
   return (
     <>
       <div className="flex w-[40rem] rounded-lg bg-gray shadow-xl shadow-black/5 ring-1 ring-slate-700/10">
@@ -151,6 +164,7 @@ function AudioPlayer(props: AudioPlayerProps) {
         onVolumeChange={onVolumeChange}
         onEnded={onEnded}
       ></audio>
+      <canvas />
     </>
   )
 }
