@@ -144,7 +144,6 @@ function AudioPlayer(props: AudioPlayerProps) {
         </div>
       </div>
       <audio
-        className="hidden"
         ref={audioRef}
         src={src}
         onTimeUpdate={onTimeUpdate}
