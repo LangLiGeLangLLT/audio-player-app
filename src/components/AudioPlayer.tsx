@@ -31,7 +31,6 @@ function AudioPlayer(props: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
   const volumeRef = useRef<HTMLDivElement>(null)
-  const requestRef = useRef<number>()
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying)
@@ -99,18 +98,6 @@ function AudioPlayer(props: AudioPlayerProps) {
       audioRef.current?.play()
     } else {
       audioRef.current?.pause()
-    }
-  }, [isPlaying])
-
-  useEffect(() => {
-    if (isPlaying) {
-      const updateFrequency = () => {
-        console.log('updateFrequency')
-        requestRef.current = requestAnimationFrame(updateFrequency)
-      }
-      updateFrequency()
-    } else {
-      requestRef.current && cancelAnimationFrame(requestRef.current)
     }
   }, [isPlaying])
 
