@@ -103,8 +103,8 @@ function AudioPlayer(props: AudioPlayerProps) {
 
   return (
     <>
-      <div className="flex w-[40rem] rounded-lg bg-gray shadow-xl shadow-black/5 ring-1 ring-slate-700/10">
-        <div className="flex items-center space-x-4 px-6 py-4 hover:cursor-pointer">
+      <div className="flex w-[40rem] rounded-lg bg-gray shadow-xl shadow-black/5 ring-1 ring-indigo-700/10">
+        <div className="flex items-center space-x-4 px-6 py-4 hover:cursor-pointer text-indigo-100">
           <Back onClick={onBack} />
           {isPlaying ? (
             <CiPause1 size={30} onClick={togglePlay} />
@@ -113,12 +113,12 @@ function AudioPlayer(props: AudioPlayerProps) {
           )}
           <Forward onClick={onForward} />
         </div>
-        <div className="flex flex-auto items-center border-1 border-slate-200/60 pl-6 pr-4 text-[0.8125rem] leading-5 text-slate-700">
+        <div className="flex flex-auto items-center border-1 border-indigo-200/60 pl-6 pr-4 text-[0.8125rem] leading-5 text-indigo-700">
           <div>{`${getMinutes(currentTime)}:${getSeconds(currentTime)}`}</div>
           <div
             ref={progressRef}
             onClick={onProgressClick}
-            className="ml-4 flex flex-auto rounded-full bg-slate-100 hover:cursor-pointer"
+            className="ml-4 flex flex-auto rounded-full bg-indigo-100 hover:cursor-pointer"
           >
             <div
               className="h-2 rounded-l-full rounded-r-[1px] bg-indigo-600"
@@ -133,7 +133,7 @@ function AudioPlayer(props: AudioPlayerProps) {
           <div
             ref={volumeRef}
             onClick={onVolumeClick}
-            className="ml-4 flex w-14 rounded-full bg-slate-100 hover:cursor-pointer"
+            className="ml-4 flex w-14 rounded-full bg-indigo-100 hover:cursor-pointer"
           >
             <div
               className="h-2 rounded-l-full rounded-r-[1px] bg-indigo-600"
@@ -151,7 +151,6 @@ function AudioPlayer(props: AudioPlayerProps) {
         onVolumeChange={onVolumeChange}
         onEnded={onEnded}
       ></audio>
-      <canvas />
     </>
   )
 }
