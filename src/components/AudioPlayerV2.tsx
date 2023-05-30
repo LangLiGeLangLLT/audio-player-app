@@ -39,7 +39,7 @@ function AudioPlayerV2(props: AudioPlayerProps) {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [progress, setProgress] = useState(0)
-  const [volume, setVolume] = useState(40)
+  const [volume, setVolume] = useState(30)
 
   const scale = useMemo(() => (duration ? duration / 100 : 1), [duration])
 
@@ -54,7 +54,7 @@ function AudioPlayerV2(props: AudioPlayerProps) {
   const timer = useRef<number>()
   const canvasCtx = useRef<CanvasRenderingContext2D | null>()
   const bufferPercent = useRef<number>(75)
-  const prevVolume = useRef<number>(40)
+  const prevVolume = useRef<number>(0)
 
   useEffect(() => {
     if (isPlaying) {
@@ -96,7 +96,7 @@ function AudioPlayerV2(props: AudioPlayerProps) {
           const bufferSize =
             (bufferLength.current * bufferPercent.current) / 100
 
-          let x = 0
+          let x = gap / 2
           for (let i = 0; i < barCount; i++) {
             const percent = Math.round((i * 100) / barCount)
             const pos = Math.round((bufferSize * percent) / 100)
