@@ -15,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <link rel="shortcut icon" href="/audioPlayer/favicon.ico" type="image/x-icon" />
+      <link rel="shortcut icon" href="/audio_player/favicon.ico" type="image/x-icon" />
       <body className={inter.className}>{children}</body>
     </html>
   )
