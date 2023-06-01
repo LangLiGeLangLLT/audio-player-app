@@ -127,9 +127,8 @@ function AudioPlayerV2(props: AudioPlayerProps) {
   useEffect(() => {
     if (!audio.current || !canvas.current) return
 
-    audioCtx.current = audioCtx.current || new AudioContext()
-    track.current =
-      track.current || audioCtx.current.createMediaElementSource(audio.current)
+    audioCtx.current = new AudioContext()
+    track.current = audioCtx.current.createMediaElementSource(audio.current)
     gainNode.current = audioCtx.current.createGain()
     analyzerNode.current = audioCtx.current.createAnalyser()
 
