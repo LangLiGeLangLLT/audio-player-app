@@ -8,7 +8,8 @@ export default function Home() {
   const [supported, setSupported] = useState<Partial<boolean>>()
 
   useEffect(() => {
-    setSupported(!!window.AudioContext)
+    const AudioContext = window.AudioContext || (window as any).WebkitAudioContext
+    setSupported(!!AudioContext)
   }, [])
 
   return (
