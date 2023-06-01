@@ -170,7 +170,7 @@ function AudioPlayerV2(props: AudioPlayerProps) {
 
     if (audioCtx.current.state === 'suspended') {
       await audioCtx.current.resume()
-      audio.current.currentTime = currentTime
+      audio.current.currentTime = Math.min(currentTime, duration)
     }
     setIsPlaying(!isPlaying)
   }
@@ -180,7 +180,7 @@ function AudioPlayerV2(props: AudioPlayerProps) {
 
     const progress = e.target.valueAsNumber
     const currentTime = progress * scale
-    audio.current.currentTime = currentTime
+    audio.current.currentTime = Math.min(currentTime, duration)
     setProgress(progress)
   }
 

@@ -60,7 +60,7 @@ function AudioPlayer(props: AudioPlayerProps) {
       const { clientWidth } = progressRef.current
       const { offsetX } = event.nativeEvent
       const currentTime = (offsetX / clientWidth) * duration
-      audioRef.current.currentTime = currentTime
+      audioRef.current.currentTime = Math.min(currentTime, duration)
     }
   }
 
@@ -76,14 +76,14 @@ function AudioPlayer(props: AudioPlayerProps) {
   const onBack = () => {
     if (audioRef.current) {
       const currentTime = Math.max(audioRef.current.currentTime - 15, 0)
-      audioRef.current.currentTime = currentTime
+      audioRef.current.currentTime = Math.min(currentTime, duration)
     }
   }
 
   const onForward = () => {
     if (audioRef.current) {
       const currentTime = Math.min(audioRef.current.currentTime + 15, duration)
-      audioRef.current.currentTime = currentTime
+      audioRef.current.currentTime = Math.min(currentTime, duration)
     }
   }
 
