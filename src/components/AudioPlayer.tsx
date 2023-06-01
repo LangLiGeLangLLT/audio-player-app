@@ -89,15 +89,17 @@ function AudioPlayer(props: AudioPlayerProps) {
 
   useEffect(() => {
     intervalTimer.current = setInterval(() => {
-      if (duration !== 0) {
-        clearInterval(intervalTimer.current)
-        return
-      }
       if (audioRef.current) {
         setDuration(audioRef.current.duration)
       }
     }, 10)
   }, [])
+
+  useEffect(() => {
+    if (duration) {
+      intervalTimer.current && clearInterval(intervalTimer.current)
+    }
+  }, [duration])
 
   useEffect(() => {
     if (isPlaying) {

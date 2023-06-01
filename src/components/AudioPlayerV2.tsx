@@ -145,17 +145,19 @@ function AudioPlayerV2(props: AudioPlayerProps) {
       .connect(audioCtx.current.destination)
 
     intervalTimer.current = setInterval(() => {
-      if (duration !== 0) {
-        clearInterval(intervalTimer.current)
-        return
-      }
       if (audio.current) {
         setDuration(audio.current.duration)
       }
     }, 10)
-    
+
     canvasCtx.current = canvas.current.getContext('2d')
   }, [])
+
+  useEffect(() => {
+    if (duration) {
+      intervalTimer.current && clearInterval(intervalTimer.current)
+    }
+  }, [duration])
 
   useEffect(() => {
     if (gainNode.current) {
