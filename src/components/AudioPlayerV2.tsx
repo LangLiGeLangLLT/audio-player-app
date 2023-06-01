@@ -122,8 +122,8 @@ function AudioPlayerV2(props: AudioPlayerProps) {
   }, [isPlaying])
 
   useEffect(() => {
-    setCurrentTime(progress * scale)
-  }, [progress, scale])
+    setCurrentTime(Math.min(progress * scale, duration))
+  }, [duration, progress, scale])
 
   useEffect(() => {
     if (!audio.current || !canvas.current) return

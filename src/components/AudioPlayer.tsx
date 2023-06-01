@@ -40,7 +40,7 @@ function AudioPlayer(props: AudioPlayerProps) {
   const onTimeUpdate = () => {
     if (audioRef.current) {
       const currentTime = audioRef.current.currentTime
-      setCurrentTime(currentTime)
+      setCurrentTime(Math.min(currentTime, duration))
     }
   }
 
