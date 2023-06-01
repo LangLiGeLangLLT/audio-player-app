@@ -55,6 +55,7 @@ function AudioPlayerV2(props: AudioPlayerProps) {
   const canvasCtx = useRef<CanvasRenderingContext2D | null>()
   const bufferPercent = useRef<number>(75)
   const prevVolume = useRef<number>(0)
+  const intervalTimer = useRef<any>()
 
   useEffect(() => {
     if (isPlaying) {
@@ -143,8 +144,16 @@ function AudioPlayerV2(props: AudioPlayerProps) {
       .connect(analyzerNode.current)
       .connect(audioCtx.current.destination)
 
-    setDuration(audio.current.duration)
-
+    intervalTimer.current = setInterval(() => {
+      if (duration !== 0) {
+        clearInterval(intervalTimer.current)
+        return
+      }
+      if (audio.current) {
+        setDuration(audio.current.duration)
+      }
+    }, 10)
+    
     canvasCtx.current = canvas.current.getContext('2d')
   }, [])
 

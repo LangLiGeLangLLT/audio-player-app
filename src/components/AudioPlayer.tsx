@@ -31,6 +31,7 @@ function AudioPlayer(props: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
   const volumeRef = useRef<HTMLDivElement>(null)
+  const intervalTimer = useRef<any>()
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying)
@@ -87,10 +88,15 @@ function AudioPlayer(props: AudioPlayerProps) {
   }
 
   useEffect(() => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration)
-      setCurrentTime(audioRef.current.currentTime)
-    }
+    intervalTimer.current = setInterval(() => {
+      if (duration !== 0) {
+        clearInterval(intervalTimer.current)
+        return
+      }
+      if (audioRef.current) {
+        setDuration(audioRef.current.duration)
+      }
+    }, 10)
   }, [])
 
   useEffect(() => {
@@ -149,6 +155,7 @@ function AudioPlayer(props: AudioPlayerProps) {
         onTimeUpdate={onTimeUpdate}
         onVolumeChange={onVolumeChange}
         onEnded={onEnded}
+        onLoad={() => console.log('onLoad')}
       ></audio>
     </>
   )
