@@ -1,5 +1,5 @@
 # Base on offical Node.js Alpine image
-FROM node:18.16.0-alpine
+FROM node:18.18.2
 
 # Set working directory
 WORKDIR /usr/app
@@ -12,7 +12,7 @@ RUN npm install --global pm2
 COPY ./package*.json ./
 
 # Install dependencies
-RUN npm install --production
+RUN npm install
 
 # Copy all files
 COPY ./ ./
